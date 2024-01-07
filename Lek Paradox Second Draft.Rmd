@@ -1,0 +1,218 @@
+---
+title: "Lek-Paradox Second Draft"
+author: "LRM"
+date: "`r Sys.Date()`"
+output: 
+  github_document:
+    toc: FALSE
+    toc_float: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Update Keys
+gitcreds::gitcreds_set()
+
+#This is all Major WIP
+
+
+##Model Overview
+#Lek Paradox Second Draft
+#Make a new Model with updated Ideas
+#Make a female choose male model in which there arent a female prefences explictly set nor any thresholds.
+#This model assumes extreme polygeny. Many women choose 1 man
+#Instead, have equal numbers of males/females OR random, Each agent having an ID associated.
+#Assign sex values either 1 or 0. 
+#Each agent has a trait value assigned via a genetics system.
+#A seperate vector containing each agents ID value would be assigned a 0 or 1 loci value from L1 to L100
+#Can be assigned via, rbinom(100,1,0.5) IN OTHER WORDS, ID of 100 to 1 given a 50% chance to be assigned a 1 or 0 in each loci value>
+#Trait values per agent is decided through the sum of all loci values from the genetics system vector.
+#FROM THERE, since many females are given the abilty to mate with 1 male, this is decided through which available male 
+#has the highest trait value from the sum of the loci values in the genetic system vector.
+#IE  0=Female 1=Male 
+#ID SEX TRAIT       ID    GENETIC SYSTEM L1 L2 L3 L4 L5.... L100
+#1   0    70        1                     0 1  0  1  0      0 
+#2   0    60        2                     1
+#3   0    30        3
+#4   1    0         4
+#5   1    10        5
+#6   1    50        6
+
+##Purpose##
+#To see in a primarliy polygenous species how a males mate value mixed with the multiple females genetic varience, produce offspring with either a highly varied trait value profile or produce a similar/linear trait value generation via evolution (IE Genetic Run Off)
+##Agents
+```{r agents}
+
+
+
+```
+
+##Life Cycle
+```{r lifeCycle}
+
+```
+
+
+##Assess
+```{r assess}
+
+```
+
+
+##Analysis
+```{r analysis}
+
+```
+
+##Model
+```{r model}
+
+```
+
+
+##Packages
+```{r packages}
+
+library(ggplot2)
+
+```
+
+
+##Parameters
+```{r parameters}
+
+popSize <- 6
+
+```
+
+
+
+##Functions
+```{r functions}
+
+agentGenerate <- function(popSize){
+  
+  
+  ID<-1:popSize
+  
+  #Assign each agent a random Gender #Sample chooses random option
+  sex <- rep(c("Male","Female"),each = popSize/2)
+  
+  #male <- sample(c)
+  #female <- 1
+  
+  genetics <- rbinom(popSize,100,0.5)
+
+
+  #Pretty sure these are the same things just written differently
+  traitValueMale <- sample(genetics,popSize,replace=T)
+  traitValueFemale <- sample(rbinom(popSize,100,0.5),popSize,replace=T)
+  
+  
+
+  #Generate agents
+  agents <- data.frame(ID,sex,genetics,traitValueMale,traitValueFemale)
+  
+  #Return Agents
+  return(agents)
+}
+
+#For Reproductibility?
+set.seed(01)
+
+#Stores First Gen Agent Data
+agents_data<-data.frame(agentGenerate(popSize))
+#Vector that stores agents Loci values from 1 to 100
+  #storedGenetics<- rep(NA,nrow(agents*100))
+  
+
+#TO CHECK IF A VECTOR IS ATOMIC
+is.atomic(agents$ID)
+
+#Sus out the highest trait value and male (potential problem, 2 males with the same value)
+maleAgentsData <- agents_data[agents_data$sex == "Male",]
+chosenMale <- maleAgentsData$ID[which.max(maleAgentsData$traitValueMale)]
+max_traitValueMale <- max(maleAgentsData$traitValueMale)
+
+femaleAgentsData <- agents_data[agents_data$sex == "Female",]
+
+#Ignores Missing Values
+#na.rm = T
+
+totalOffspring <-(popSize)
+
+reproduction <- function (femaleAgentsData, maleAgentsData,totalOffspring){
+  
+  
+  
+  #get the maximum ID available for both male and female agents
+  maxID <- max(c(max(femaleAgentsData$ID, na.rm = T), max(maleAgentsData$ID, na.rm = T)))
+  
+  offspring <- data.frame(
+    #Get the Latest ID, add 1, to get the next level of offspring ID.
+   ID <- seq(maxID + 1,maxID+totalOffspring),
+   #create Male and Female offspring of each until half of the total is met
+   sex <- rep(c("Male", "Female"), each = totalOffspring/2),
+   #Genetics System from Prior function
+   genetics = rbinom(totalOffspring, 100, 0.5),
+   #Create code so that 1 mal
+   traitValueMale <- ifelse(rep(c("Male","Female"),each=totalOffspring/2)== "Male", max_traitValueMale, rep(max(maleAgentsData$traitValueMale, na.rm = TRUE),totalOffspring)),
+   traitValueFemale <- sample(femaleAgentsData$traitValueFemale, totalOffspring, replace = T)
+  )
+  
+  #Return offsprings
+  return(offspring)
+}
+
+femaleAgents <- agents_data[agents_data$sex == "Female",]
+maleAgents <- agents_data[agents_data$sex == "Male",]
+
+
+
+#Mating Process
+offspring <- reproduction(femaleAgentsData, maleAgentsData,totalOffspring)
+
+##Mating Process
+#mate <- function(popSize){
+ # if
+#}   
+
+```
+
+
+
+
+#Make a new Model with updated Ideas
+#Make a female choose male model in which there arent a female prefences explictly set nor any thresholds.
+#This model assumes extreme polygeny. Many women choose 1 man
+#Instead, have equal numbers of males/females OR random, Each agent having an ID associated.
+#Assign sex vaues either 1 or 0. 
+#Each agent has a trait value assigned via a genetics system.
+#A seperate vector containing each agents ID value would be assigned a 0 or 1 loci value from L1 to L100
+#Can be assigned via, rbinom(100,1,0.5) IN OTHER WORDS, ID of 100 to 1 given a 50% chance to be assigned a 1 or 0 in each loci value>
+#Trait values per agent is decided through the sum of all loci values from the genetics system vector.
+#FROM THERE, since many females are given the abilty to mate with 1 (1 male chosen in general, the rest die off) male, this is decided through which available male 
+#has the highest trait value from the sum of the loci values in the genetic system vector.
+#IE  0=Female 1=Male 
+#ID SEX TRAIT       ID    GENETIC SYSTEM L1 L2 L3 L4 L5.... L100
+#1   0    70        1                     0 1  0  1  0      0 
+#2   0    60        2                     1
+#3   0    30        3
+#4   1    0         4
+#5   1    10        5
+#6   1    50        6
+
+#THEN females reproduce with male, create a new set of males to fill in the ones that died? 
+
+#The offsprings trait value will consist of the random choice between both the chosen male and females trait values. IE a coin toss between either choosing L1 for the male or the female, going down to 100
+
+###Give meaning to loci values??????
+
+
+
+```{r}
+
+```
+
