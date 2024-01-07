@@ -157,10 +157,10 @@ reproduction <- function (femaleAgentsData, maleAgentsData,totalOffspring){
    sex <- rep(c("Male", "Female"), each = totalOffspring/2),
    #Genetics System from Prior function
    genetics = rbinom(totalOffspring, 100, 0.5),
-   #Create code so that 1 mal
+   #Create code so that the max TV of the prior male 
    traitValueMale <- ifelse(rep(c("Male","Female"),each=totalOffspring/2)== "Male", max_traitValueMale, rep(max(maleAgentsData$traitValueMale, na.rm = TRUE),totalOffspring)),
-   traitValueFemale <- sample(femaleAgentsData$traitValueFemale, totalOffspring, replace = T)
-  )
+   
+   traitValueFemale <- sample(rbinom(popSize,100,0.5),popSize,replace=T), totalOffspring, replace = T)
   
   #Return offsprings
   return(offspring)
